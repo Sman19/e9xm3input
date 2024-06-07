@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>2008 M3 Configuration</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-image: url('https://example.com/m3-background.jpg'); /* Replace with your M3 background image URL */
+            background-size: cover;
+            background-position: center;
+            color: #ffffff;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .container {
+            background: rgba(0, 0, 0, 0.8);
+            padding: 20px;
+            border-radius: 10px;
+            width: 400px;
+        }
+        h1, h2 {
+            text-align: center;
+            color: #FFD700;
+        }
+        label, select, input, button {
+            display: block;
+            width: 100%;
+            margin-bottom: 10px;
+        }
+        .checkbox-group {
+            margin-bottom: 15px;
+        }
+        .checkbox-group label {
+            display: block;
+        }
+        button {
+            background-color: #FFD700;
+            color: #000;
+            border: none;
+            padding: 10px;
+            cursor: pointer;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #FFA500;
+        }
+        pre {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 10px;
+            border-radius: 5px;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Configure Your 2008 M3</h1>
+        <form id="m3Form" onsubmit="submitForm(event)">
+            <label for="carType">Select Car Type:</label>
+            <select id="carType" name="carType">
+                <option value="sedan">Sedan</option>
+                <option value="coupe">Coupe</option>
+                <option value="convertible">Convertible</option>
+            </select>
+
+            <label for="vin">Enter VIN:</label>
+            <input type="text" id="vin" name="vin">
+
+            <div class="checkbox-group">
+                <label><input type="checkbox" name="feature" value="sunroof"> Sunroof</label>
+                <label><input type="checkbox" name="feature" value="leather_seats"> Leather Seats</label>
+                <label><input type="checkbox" name="feature" value="navigation"> Navigation System</label>
+                <label><input type="checkbox" name="feature" value="sports_package"> Sports Package</label>
+                <!-- Add more features as needed -->
+            </div>
+
+            <button type="submit">Submit</button>
+        </form>
+
+        <h2>Configuration Summary</h2>
+        <pre id="output"></pre>
+    </div>
+
+    <script>
+        function submitForm(event) {
+            event.preventDefault(); // Prevent form submission to reload the page
+            const carType = document.getElementById('carType').value;
+            const vin = document.getElementById('vin').value;
+            const features = Array.from(document.querySelectorAll('input[name="feature"]:checked')).map(cb => cb.value);
+
+            const data = {
+                carType,
+                vin,
+                features
+            };
+
+            fetch('http://localhost:5000/submit', { // Ensure this matches your backend URL
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => response.json())
+            .then(result => {
+                if (result.format) {
+                    document.getElementById('output').textContent = result.format;
+                } else {
+                    throw new Error('Invalid response format');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                document.getElementById('output').textContent = `An error occurred: ${error.message}`;
+            });
+        }
+    </script>
+</body>
+</html>
